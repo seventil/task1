@@ -2,10 +2,14 @@
 import json
 
 class InputHandler():
+#Класс, который предназначен для обработки входных параметров. Проверит указан ли формат данных или путь
+#или был указан правильно, если нет - будет запрашивать путь от пользователя
     def __init__(self):
         pass  
     
-    def getPath(self, file, path = None):        
+    def getData(self, file, path = None): 
+    #метод используется для загрузки данных из файла. Если метод был вызван без указания пути или с неправильно
+    #указанным путем файла, метод будет запрашивать у пользователя правильный путь
         while True:
             if path == None: 
                 path = input(f"Plaese, enter a path to the {file} file: ")
@@ -19,6 +23,8 @@ class InputHandler():
         return jsonData
     
     def getOutput(self, outputFormat = None):
+    #метод используется для проверки правильного указания формата файла. Если формат не указан или указан неправильно
+    #метод будет запрашивать у пользователя подходящее название
         while True:
             if outputFormat == None:
                 outputFormat = input("Please, enter an output file format (XML or JSON): ").upper()  
@@ -36,9 +42,9 @@ class InitialDataHandler():
 #которые представляют собой последовательность: название файла, путь к студентам, путь к комнатам, название файла на выход
 #используя соответствующие методы, можно получить лист для студентов, лист для комнат и строку формат файла
     def __init__(self, args):
-        #интересующие нас пераргументы изначально приравниваются к None или присваиваются из args, если они там указаны
-        #работает только со строгой последовательностью в args: [1] - путь к студентам, [2] - путь к комнатам,
-        #[3] - формат файла на выходе
+    #интересующие нас пераргументы изначально приравниваются к None или присваиваются из args, если они там указаны
+    #работает только со строгой последовательностью в args: [1] - путь к студентам, [2] - путь к комнатам,
+    #[3] - формат файла на выходе
         self.studentPath = None
         self.roomsPath = None
         self.dataFormat = None
@@ -53,10 +59,10 @@ class InitialDataHandler():
             self.dataFormat = self.args[3]
                        
     def getStudents(self):
-        return self.ih.getPath("students", self.studentPath)
+        return self.ih.getData("students", self.studentPath)
     
     def getRooms(self):
-        return self.ih.getPath("rooms", self.roomsPath)
+        return self.ih.getData("rooms", self.roomsPath)
     
     def getOutputFormat(self):
         return self.ih.getOutput(self.dataFormat)
