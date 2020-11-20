@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import xml.etree.cElementTree as ET
 
 class FileDump():
 # Класс, при инициализации объекта которого через входной параметр fileType определяется формат выходного файла
@@ -15,7 +16,20 @@ class FileDump():
                 json.dump(data, f, indent = 2)
                 
         if self.fileType == "XML":
-            print("XML not realised!")
+            name = name + ".xml"
+            root = ET.Element("root")
+            for i in data:     
+                room = ET.SubElement(root, "room")
+                ET.SubElement(room, "id").text = str(i["id"])
+                ET.SubElement(room, "name").text = i["name"]
+                students = ET.SubElement(room, "students")
+                for k in i["students"]:
+                    stud = ET.SubElement(students, "student")
+                    ET.SubElement(stud, "id").text = str(k["id"])
+                    ET.SubElement(stud, "name").text = k["name"]
+            tree = ET.ElementTree(root)
+            tree.write(name)
+            
                 
         
     
