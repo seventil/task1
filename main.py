@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 import sys
 from inputCheck import InitialDataHandler
-
-#args = ["1","students.json","rooms.json","XML"]
+from fileDump import FileDump
 
 idh = InitialDataHandler(sys.argv)
+
 students = idh.getStudents()
 rooms = idh.getRooms()
 outputFormat = idh.getOutputFormat()
 
+for i in rooms:
+    i["students"] = [{"id":x["id"], "name":x["name"]} for x in students if x["room"] == i["id"]]
+    
+fd = FileDump(outputFormat)
+fd.writeFile("output", rooms)
 
-print("outputFormat = ", outputFormat)
-print("rooms ", len(rooms))
-print("students ", len(students))
-print("finished")
-   
+print("all done")
