@@ -1,2 +1,5 @@
 
 output.json
+__pycache__
+__pycache__/file_dump.cpython-39.pyc
+__pycache__/input_check.cpython-39.pyc
