@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
 import sys
-from inputCheck import InitialDataHandler
-from fileDump import FileDump
+from input_check import InitialDataHandler
+from file_dump import FileDump
 
-idh = InitialDataHandler(sys.argv)
+initial_data_handler = InitialDataHandler(sys.argv)
 
-students = idh.getStudents()
-rooms = idh.getRooms()
-outputFormat = idh.getOutputFormat()
+students = initial_data_handler.getStudents()
+rooms = initial_data_handler.getRooms()
+outputFormat = initial_data_handler.getOutputFormat()
 
-for i in rooms:
-    i["students"] = [{"id":x["id"], "name":x["name"]} for x in students if x["room"] == i["id"]]
+for room in rooms:
+	students_in_room = []
+	for student in students:
+		if student["room"] == room["id"]:
+			students_in_room.append({"id":student["id"], "name":student["name"]})
     
-fd = FileDump(outputFormat)
-fd.writeFile("output", rooms)
+file_dump = FileDump(outputFormat)
+file_dump.writeFile("output", rooms)
 
 print("all done")
