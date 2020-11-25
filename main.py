@@ -14,6 +14,7 @@ for room in rooms:
 	for student in students:
 		if student["room"] == room["id"]:
 			students_in_room.append({"id":student["id"], "name":student["name"]})
+	room["students"] = students_in_room
     
 file_dump = FileDump(outputFormat)
 file_dump.writeFile("output", rooms)
