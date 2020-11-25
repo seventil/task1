@@ -1,4 +1,4 @@
 
 output.json
 output.xml
-*.pyc
+__pycache__/
