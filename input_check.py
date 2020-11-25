@@ -3,18 +3,19 @@ import argparse
 import os
 
     
-def get_data_from_file(file_to_open, path = None): 
-#метод используется для загрузки данных из файла. Если метод был вызван без указания пути или с неправильно
-#указанным путем файла, метод будет запрашивать у пользователя правильный путь
+def get_data_from_file(path = None): 
+# Функция используется для загрузки данных из файла.
+# Если по указанному пути файл не открывается,
+# функция будет запрашивать у пользователя правильный путь
     while True:
         if path == None: 
-            path = input(f"Please, enter a path to the {file_to_open} file: ")
+            path = input(f"Please, enter a new path to the file: ")
         try:
             with open(path) as file:
                 json_data = json.loads(file.read())
                 break;
         except IOError:
-            print(f"{file_to_open} file is not accessible, try another path")
+            print(f"File in {path} is not accessible, try another path")
             path = None
     return json_data
 
