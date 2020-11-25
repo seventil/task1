@@ -10,7 +10,7 @@ class FileDump():
         self.file_type = file_type
         # Если при инициализации объекта не было задано имя,
         # параметру file_name присваивается стандартное значение
-        if file_name not None:
+        if file_name is not None:
             self.file_name = file_name
         else:
             self.file_name = "output"
