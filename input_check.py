@@ -2,33 +2,33 @@ import json
 import argparse
 
     
-def checkData(file_to_open, path = None): 
+def check_data(file_to_open, path = None): 
 #метод используется для загрузки данных из файла. Если метод был вызван без указания пути или с неправильно
 #указанным путем файла, метод будет запрашивать у пользователя правильный путь
     while True:
         if path == None: 
             path = input(f"Please, enter a path to the {file_to_open} file: ")
         try:
-            with open(path) as a:
-                jsonData = json.loads(a.read())
+            with open(path) as file:
+                json_data = json.loads(file.read())
                 break;
         except IOError:
             print(f"{file_to_open} file is not accessible, try another path")
             path = None
-    return jsonData
+    return json_data
 
-def checkOutput(outputFormat = None):
+def check_output(output_format = None):
 #метод используется для проверки правильного указания формата файла. Если формат не указан или указан неправильно
 #метод будет запрашивать у пользователя подходящее название
     while True:
-        if outputFormat == None:
-            outputFormat = input("Please, enter an output file format: ").upper()  
-        if outputFormat.lower() == "xml" or outputFormat.lower() == "json":
+        if output_format == None:
+            output_format = input("Please, enter an output file format: ")
+        if output_format.upper() == "XML" or output_format.upper() == "JSON":
             break;
         else:
             print("File format is invalid. Please, enter another file format")
-            outputFormat = None
-    return outputFormat
+            output_format = None
+    return output_format
 
 def get_initial_args():
     parser = argparse.ArgumentParser(description="Join students and rooms files")
