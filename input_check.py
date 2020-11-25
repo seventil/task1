@@ -1,8 +1,9 @@
 import json
 import argparse
+import os
 
     
-def check_data(file_to_open, path = None): 
+def get_data_from_file(file_to_open, path = None): 
 #метод используется для загрузки данных из файла. Если метод был вызван без указания пути или с неправильно
 #указанным путем файла, метод будет запрашивать у пользователя правильный путь
     while True:
@@ -17,24 +18,25 @@ def check_data(file_to_open, path = None):
             path = None
     return json_data
 
-def check_output(output_format = None):
-#метод используется для проверки правильного указания формата файла. Если формат не указан или указан неправильно
-#метод будет запрашивать у пользователя подходящее название
-    while True:
-        if output_format == None:
-            output_format = input("Please, enter an output file format: ")
-        if output_format.upper() == "XML" or output_format.upper() == "JSON":
-            break;
-        else:
-            print("File format is invalid. Please, enter another file format")
-            output_format = None
-    return output_format
 
 def get_initial_args():
     parser = argparse.ArgumentParser(description="Join students and rooms files")
-    parser.add_argument("students", help="Path to students file")
-    parser.add_argument("rooms", help="Path to rooms file")
-    parser.add_argument("output", help="Type of an output file")
+    parser.add_argument("students", type=valid_path, help="Path to students file")
+    parser.add_argument("rooms", type=valid_path, help="Path to rooms file")
+    parser.add_argument("output", type=valid_type, help="Type of an output file")
     return parser.parse_args()
 
-    
+
+def valid_path(path):
+    if not os.path.isfile(path):  
+        raise argparse.ArgumentTypeError("Invalid path argument")
+    else:
+        return path
+
+
+def valid_type(file_type):
+    VALID_TYPES = ("XML", "JSON")
+    if file_type.upper() not in VALID_TYPES:
+        raise argparse.ArgumentTypeError("Invalid file format (choose XML or JSON)")        
+    else:        
+        return file_type
