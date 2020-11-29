@@ -7,14 +7,14 @@ class Writer(ABC):
 # Интерфейс для взаимодействия класса FileDump с классами, записывающими данные
 # в файл, в бд и т.п. с соотв. типом данных: XML, JSON и т.д.
     @abstractmethod
-    def write_to_file(self, data):
+    def write(self, data):
         pass
 
 
 class JsonWriter(Writer):
     def __init__(self, name):
         self.name = name
-    def write_to_file(self, data):
+    def write(self, data):
         with open(self.name, "w") as file:
                 json.dump(data, file, indent = 2)
     
@@ -22,7 +22,7 @@ class JsonWriter(Writer):
 class XmlWriter(Writer):
     def __init__(self, name):
         self.name = name
-    def write_to_file(self, data):
+    def write(self, data):
         # построение дерева для xml файла по строгой иерархии, с которой
         # в метод передается data и последующее сохранение дерева в файл
         root = ET.Element("root")
@@ -58,10 +58,13 @@ class DataDumper():
     def writer_selector(self):
     #метод, с помощью которого можно получить объект класса,
     #осуществляющего запись данных с соответствующим 
-        DATA_DUMP_TYPES = {"JSON":JsonWriter(self.file_name), "XML":XmlWriter(self.file_name)}
-        return DATA_DUMP_TYPES[self.file_type]
-
-       
+        TYPES_DICT = {"JSON":JsonWriter(self.file_name), "XML":XmlWriter(self.file_name)}
+        return TYPES_DICT[self.file_type]
+    
+    def dump_data(self, data):
+        writer = self.writer_selector()
+        writer.write(data)
+        
     def write_to_file(self, data): 
     # метод, записывающий в файл данные, переданные с data,
     # в соответствии с заданными в объекте file_type и file_name       
