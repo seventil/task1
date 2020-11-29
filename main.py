@@ -1,6 +1,6 @@
 import sys
 import input_check
-from file_dump import FileDump
+from data_dump import DataDumper
 
 
 def main():
@@ -16,8 +16,8 @@ def main():
 	                students_in_room.append({"id":student["id"], "name":student["name"]})
 	        room["students"] = students_in_room
 
-	    file_dump = FileDump(args.output)
-	    file_dump.write_to_file(rooms)
+	    dumper = DataDumper(args.output)
+	    dumper.dump_data(rooms)
 	except Exception:
 		return 1
 	else:
