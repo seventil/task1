@@ -9,7 +9,7 @@ def get_data_from_file(path = None):
 # функция будет запрашивать у пользователя правильный путь
     while True:
         if path == None: 
-            path = input(f"Please, enter a new path to the file: ")
+            path = input("Please, enter a new path to the file: ")
         try:
             with open(path) as file:
                 json_data = json.loads(file.read())
