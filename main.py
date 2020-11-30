@@ -1,6 +1,6 @@
 import sys
 import input_check
-from data_dump import DataDumper
+from data_dump import DataDumper, WriterFactory
 
 
 def main():
@@ -17,12 +17,14 @@ def main():
                                              "name": student["name"]})
             room["students"] = students_in_room
 
-        dumper = DataDumper(args.output)
-        dumper.dump_data(rooms)
+        dumper = DataDumper(WriterFactory())
+        dumper.dump_data(rooms, args.output, "output")
+
     except Exception:
         return 1
     else:
         return 0
 
-    if __name__ == "__main__":
-        sys.exit(main())
+
+if __name__ == "__main__":
+    sys.exit(main())
