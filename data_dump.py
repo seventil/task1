@@ -61,12 +61,13 @@ class DataDumper():
         # оно добавляется автоматически
         if self.file_type.lower() not in self.file_name:
             self.file_name += "." + file_type.lower()
-            
+        
     def writer_selector(self):
     #метод, с помощью которого можно получить объект класса,
     #осуществляющего запись данных с соответствующим 
-        TYPES_DICT = {"JSON":JsonWriter(self.file_name), "XML":XmlWriter(self.file_name)}
-        return TYPES_DICT[self.file_type]
+        writer_factory = WriterFactory()
+        types_dict = {"JSON":writer_factory.get_json_writer, "XML":writer_factory.get_xml_writer}
+        return types_dict[self.file_type(self.file_name)]
     
     def dump_data(self, data):
         writer = self.writer_selector()
