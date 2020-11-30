@@ -40,9 +40,9 @@ class XmlWriter(Writer):
         
         
 class WriterFactory():
-    def get_json_writer(name):
+    def get_json_writer(self, name):
         return JsonWriter(name)
-    def get_xml_writer(name):
+    def get_xml_writer(self, name):
         return XmlWriter(name)
 
 
@@ -65,8 +65,9 @@ class DataDumper():
     def writer_selector(self):
     #метод, с помощью которого можно получить объект класса,
     #осуществляющего запись данных с соответствующим 
-        TYPES_DICT = {"JSON":JsonWriter(self.file_name), "XML":XmlWriter(self.file_name)}
-        return TYPES_DICT[self.file_type]
+        writer_factory = WriterFactory()
+        TYPES_DICT = {"JSON":writer_factory.get_json_writer, "XML":writer_factory.get_xml_writer}
+        return TYPES_DICT[self.file_type](self.file_name)
     
     def dump_data(self, data):
         writer = self.writer_selector()
