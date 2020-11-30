@@ -37,6 +37,13 @@ class XmlWriter(Writer):
                 ET.SubElement(stud, "name").text = students_data["name"]
         tree = ET.ElementTree(root)
         tree.write(self.name) 
+        
+        
+class WriterFactory():
+    def get_json_writer(name):
+        return JsonWriter(name)
+    def get_xml_writer(name):
+        return XmlWriter(name)
 
 
 class DataDumper():
