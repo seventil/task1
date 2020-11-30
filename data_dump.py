@@ -5,26 +5,22 @@ from abc import ABC, abstractmethod
 
 class Writer(ABC):
     @abstractmethod
-    def write(self, data):
+    def write(self, output_name, data):
         pass
 
 
 class JsonWriter(Writer):
-    def __init__(self, name):
-        self.name = name
-
-    def write(self, data):
-        with open(self.name, "w") as file:
+    def write(self, output_name, data):
+        output_name += ".json"
+        with open(output_name, "w") as file:
             json.dump(data, file, indent=2)
 
 
 class XmlWriter(Writer):
-    def __init__(self, name):
-        self.name = name
-
-    def write(self, data):
+    def write(self, output_name, data):
         # построение дерева для xml файла по строгой иерархии, с которой
         # в метод передается data и последующее сохранение дерева в файл
+        output_name += ".xml"
         root = ET.Element("root")
         for room_data in data:
             room_branch = ET.SubElement(root, "room")
@@ -36,41 +32,28 @@ class XmlWriter(Writer):
                 ET.SubElement(stud, "id").text = str(students_data["id"])
                 ET.SubElement(stud, "name").text = students_data["name"]
         tree = ET.ElementTree(root)
-        tree.write(self.name)
+        tree.write(output_name)
 
 
 class WriterFactory():
-    def get_json_writer(self, name):
-        return JsonWriter(name)
+    def __init__(self):
+        self.types_dict = {
+            "JSON": JsonWriter,
+            "XML": XmlWriter
+        }
 
-    def get_xml_writer(self, name):
-        return XmlWriter(name)
+    def create_writer(self, output_type) -> Writer:
+        return self.types_dict[output_type]()
 
 
 class DataDumper():
-    # Класс предназначен для того, чтобы в соотв. с установленным форматом
-    # и названием файла передать данные в writer
-    def __init__(self, file_type, file_name=None):
-        self.file_type = file_type
-        # Если при инициализации объекта не было задано имя,
-        # параметру file_name присваивается стандартное значение
-        if file_name is not None:
-            self.file_name = file_name
+    def __init__(self, writer_factory: WriterFactory):
+        self.writer_factory = writer_factory
+
+    def dump_data(self, data, output_type, output_name=None):
+        if output_name is not None:
+            self.output_name = output_name
         else:
-            self.file_name = "output"
-        # Если в указанном имени не присутствует соотв. расширение,
-        # оно добавляется автоматически
-        if self.file_type.lower() not in self.file_name:
-            self.file_name += "." + file_type.lower()
-
-    def writer_selector(self):
-        # Метод, с помощью которого можно получить объект класса,
-        # осуществляющего запись данных с соответствующим
-        writer_factory = WriterFactory()
-        TYPES_DICT = {"JSON": writer_factory.get_json_writer,
-                      "XML": writer_factory.get_xml_writer}
-        return TYPES_DICT[self.file_type](self.file_name)
-
-    def dump_data(self, data):
-        writer = self.writer_selector()
-        writer.write(data)
+            self.output_name = "output"
+        writer = self.writer_factory.create_writer(output_type)
+        writer.write(output_name, data)
