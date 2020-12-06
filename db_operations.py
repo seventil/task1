@@ -87,15 +87,15 @@ class QueryOrganizer():
         self.queries = {}
         self.queries[1] = ("SELECT r.id, r.name, s.cnt FROM rooms r "
              "JOIN (SELECT COUNT(students.id) cnt, room "
-             "FROM students GROUP BY room) s ON (r.id = s.room) LIMIT 3")
+             "FROM students GROUP BY room) s ON (r.id = s.room)")
         
         self.column_names = {}
         self.column_names[1] = ('room_id', 'room_name', 'students_count')
 
-    def get_query():
+    def get_query(self):
         return self.queries[self.number]
 
-    def get_column_names():
+    def get_column_names(self):
         return self.column_names[self.number]
 
 
