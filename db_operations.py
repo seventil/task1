@@ -29,39 +29,72 @@ class DBConnection():
         return self.conn
 
 
-def create_tables(connection: DBConnection):
+def create_tables(connection: DBConnection, cleanse=False):
+    # создает новые таблицы, или удаляет все данные из уже созданных
     conn = connection.get_conn()
     cursor = conn.cursor()
 
     TABLES = {}
     TABLES["rooms"] = (
-        "CREATE TABLE IF NOT EXISTS `rooms` ("
-        "`id` INT UNSIGNED NOT NULL,"
-        "`name` VARCHAR(30) NOT NULL,"
-        "PRIMARY KEY (`id`))")
+        "CREATE TABLE IF NOT EXISTS rooms ("
+        "id INT UNSIGNED NOT NULL,"
+        "name VARCHAR(30) NOT NULL,"
+        "PRIMARY KEY (id))")
     TABLES["students"] = (
-        "CREATE TABLE IF NOT EXISTS `students` ("
-        "`id` INT UNSIGNED NOT NULL,"
-        "`name` VARCHAR(30) NOT NULL,"
-        "`birthday` DATE,"
-        "`sex` CHAR,"
-        "`room` INT UNSIGNED NOT NULL,"
-        "PRIMARY KEY (`id`),"
-        "FOREIGN KEY (`room`) REFERENCES `rooms` (`id`) ON DELETE CASCADE)")
+        "CREATE TABLE IF NOT EXISTS students ("
+        "id INT UNSIGNED NOT NULL,"
+        "name VARCHAR(30) NOT NULL,"
+        "birthday DATE,"
+        "sex CHAR,"
+        "room INT UNSIGNED NOT NULL,"
+        "PRIMARY KEY (id),"
+        "FOREIGN KEY (room) REFERENCES rooms (id) ON DELETE CASCADE)")
     for table_name in TABLES:
         cursor.execute(TABLES[table_name])
-    cursor.close()
-    conn.close()
+        if cleanse:
+            cursor.execute("DELETE FROM " + table_name)
+    conn.commit()
 
 
-def insert_students(connection: DBConnection, data):
-    cursor = connection.cursor
+def insert_json_into_db(json_data, table_name, connection: DBConnection):
+    # метод принимает только лист диктов в параметре json_data
+    conn = connection.get_conn()
+    cursor = conn.cursor()
+    
+    for json_dict in json_data:
+        if type(json_dict) == dict:            
+            column_names = "(" + ", ".join([key for key in json_dict.keys()]) + ")"
+            values = ", ".join(["'" + str(value) + "'" for value in json_dict.values()])
+            query = ("INSERT INTO " + table_name + " " 
+                    + column_names
+                    + " VALUES ("
+                    + values
+                    + ")")
+        else:
+            raise Exception("Wrong json data structure")
 
-def insert_rooms(connection: DBConnection, data):
-    cursor = connection.cursor
-    cursor.execute()
+        try:
+            cursor.execute(query)
+        except mysql.connector.errors.IntegrityError:
+            print("Duplicate querry found, insert failed")
+
+    conn.commit()
 
 
-def get_joined(connection: DBConnection):
-    cursor = connection.cursor
-    cursor.execute()
+if __name__ == "__main__":    
+    import json
+
+    with open("rooms.json") as file:
+        json_data = json.loads(file.read())
+    with open("students.json") as file:
+        json_data2 = json.loads(file.read())
+
+    db_connection = DBConnection("localhost", "root", "root", "task4")
+    create_tables(db_connection, cleanse=True)
+
+    insert_json_into_db(json_data, "rooms", db_connection)
+    insert_json_into_db(json_data2, "students", db_connection)
+
+
+
+
