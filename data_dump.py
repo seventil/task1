@@ -56,4 +56,4 @@ class DataDumper():
         else:
             self.output_name = "output"
         writer = self.writer_factory.create_writer(output_type)
-        writer.write(output_name, data)
+        writer.write(self.output_name, data)
