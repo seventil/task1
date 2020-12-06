@@ -81,6 +81,39 @@ def insert_json_into_db(json_data, table_name, connection: DBConnection):
     conn.commit()
 
 
+class QueryOrganizer():
+    def __init__(self, query_number):
+        self.number = query_number
+        self.queries = {}
+        self.queries[1] = ("SELECT r.id, r.name, s.cnt FROM rooms r "
+             "JOIN (SELECT COUNT(students.id) cnt, room "
+             "FROM students GROUP BY room) s ON (r.id = s.room) LIMIT 3")
+        
+        self.column_names = {}
+        self.column_names[1] = ('room_id', 'room_name', 'students_count')
+
+    def get_query():
+        return self.queries[self.number]
+
+    def get_column_names():
+        return self.column_names[self.number]
+
+
+def get_json_from_query(query_org: QueryOrganizer, connection: DBConnection):
+    query = query_org.get_query()
+    column_names = query_org.get_column_names()
+
+    conn = connection.get_conn()
+    cursor = conn.cursor()
+    cursor.execute(query)
+
+    export_data = []
+    for row in cursor:             
+        export_data.append(dict(zip(column_names, row)))
+
+    return export_data
+
+
 if __name__ == "__main__":    
     import json
 
@@ -90,11 +123,9 @@ if __name__ == "__main__":
         json_data2 = json.loads(file.read())
 
     db_connection = DBConnection("localhost", "root", "root", "task4")
-    create_tables(db_connection, cleanse=True)
+    # create_tables(db_connection, cleanse=True)
 
-    insert_json_into_db(json_data, "rooms", db_connection)
-    insert_json_into_db(json_data2, "students", db_connection)
+    # insert_json_into_db(json_data, "rooms", db_connection)
+    # insert_json_into_db(json_data2, "students", db_connection)
 
-
-
-
+    get_students_number_in_rooms(db_connection)
