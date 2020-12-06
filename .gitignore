@@ -1,4 +1,4 @@
 
-output.json
-output.xml
+*.json
+*.xml
 __pycache__/
