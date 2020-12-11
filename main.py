@@ -17,13 +17,14 @@ def main():
     dbo.insert_json_into_db(students, "students", db_connection)
 
     solved_problems_results = {
-        'first_problem': dbo.get_json_from_query(dbo.QueryOrganizer(1), db_connection)
-
-
+        'first_problem': dbo.get_json_from_query(dbo.QueryOrganizer(1), db_connection),
+        'second_problem': dbo.get_json_from_query(dbo.QueryOrganizer(2), db_connection),
+        'third_problem': dbo.get_json_from_query(dbo.QueryOrganizer(3), db_connection),
+        'fourth_problem': dbo.get_json_from_query(dbo.QueryOrganizer(4), db_connection)
     }
 
     dumper = DataDumper(WriterFactory())
-    for name, data in solved_problems_results:
+    for name, data in solved_problems_results.items():
         dumper.dump_data(data, args.output, name)
 
 
