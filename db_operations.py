@@ -86,11 +86,27 @@ class QueryOrganizer():
         self.number = query_number
         self.queries = {}
         self.queries[1] = ("SELECT r.id, r.name, s.cnt FROM rooms r "
-             "JOIN (SELECT COUNT(students.id) cnt, room "
-             "FROM students GROUP BY room) s ON (r.id = s.room)")
+                           "JOIN (SELECT COUNT(students.id) cnt, room "
+                           "FROM students GROUP BY room) s ON (r.id = s.room)")
+        self.queries[2] = ("SELECT r.id, r.name, brd.avr FROM rooms r "
+                           "JOIN (SELECT CAST(AVG(students.birthday) AS CHAR) avr, room "
+                           "FROM students GROUP BY room ORDER BY avr "
+                           "DESC LIMIT 5) brd ON (r.id = brd.room)")
+        self.queries[3] = ("SELECT r.id, r.name, df.d FROM rooms r "
+                           "JOIN (SELECT DATEDIFF(MAX(birthday), MIN(birthday)) d, room "
+                           "FROM students GROUP BY room ORDER BY d "
+                           "DESC LIMIT 5) df ON (r.id = df.room)")
+        self.queries[4] = ("SELECT m.room FROM "
+                           "(SELECT room FROM students WHERE sex IN ('F') GROUP BY room) f "
+                           "JOIN (SELECT room FROM students "
+                           "WHERE sex in ('M') GROUP BY room) m "
+                           "ON (f.room = m.room)")
         
         self.column_names = {}
         self.column_names[1] = ('room_id', 'room_name', 'students_count')
+        self.column_names[2] = ('room_id', 'room_name', 'average_bd')
+        self.column_names[3] = ('room_id', 'room_name', 'date_diff')
+        self.column_names[4] = ('room_id',)
 
     def get_query(self):
         return self.queries[self.number]
@@ -108,9 +124,8 @@ def get_json_from_query(query_org: QueryOrganizer, connection: DBConnection):
     cursor.execute(query)
 
     export_data = []
-    for row in cursor:             
+    for row in cursor:
         export_data.append(dict(zip(column_names, row)))
-
     return export_data
 
 
@@ -123,9 +138,12 @@ if __name__ == "__main__":
         json_data2 = json.loads(file.read())
 
     db_connection = DBConnection("localhost", "root", "root", "task4")
-    # create_tables(db_connection, cleanse=True)
+    create_tables(db_connection, cleanse=True)
 
-    # insert_json_into_db(json_data, "rooms", db_connection)
-    # insert_json_into_db(json_data2, "students", db_connection)
+    insert_json_into_db(json_data, "rooms", db_connection)
+    insert_json_into_db(json_data2, "students", db_connection)
 
-    get_students_number_in_rooms(db_connection)
+    a = get_json_from_query(QueryOrganizer(4), db_connection)
+    for i in range(5):
+        print(a[i])
+
