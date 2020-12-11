@@ -81,6 +81,26 @@ def insert_json_into_db(json_data, table_name, connection: DBConnection):
     conn.commit()
 
 
+def index_tables(table_name, column_to_index, connection: DBConnection):
+    conn = connection.get_conn()
+    cursor = conn.cursor()
+    if table_exists(table_name, connection):
+        cursor.execute(f"ALTER TABLE {table_name} ADD INDEX ({column_to_index})")
+    
+
+def table_exists(table_name, connection: DBConnection):
+    conn = connection.get_conn()
+    cursor = conn.cursor()
+    cursor.execute("SHOW TABLES")
+    for row in cursor:
+        try:
+            if row[0] == table_name:
+                return True
+        except Exception:
+            return False
+    return False
+
+
 class QueryOrganizer():
     def __init__(self, query_number):
         self.number = query_number
@@ -146,4 +166,7 @@ if __name__ == "__main__":
     a = get_json_from_query(QueryOrganizer(4), db_connection)
     for i in range(5):
         print(a[i])
+
+    index_tables("students", "birthday", db_connection)
+
 
