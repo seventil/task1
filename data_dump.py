@@ -35,11 +35,25 @@ class XmlWriter(Writer):
         tree.write(output_name)
 
 
+class XmlFromDbWriter(Writer):
+    def write(self, output_name, data):
+        # построение дерева для xml файла по строгой иерархии:
+        # принимается только лист диктов
+        output_name += ".xml"
+        root = ET.Element("root")
+        for rows in data:
+            row_branch = ET.SubElement(root, "row")
+            for key, value in rows.items():
+                ET.SubElement(row_branch, str(key)).text = str(value)
+        tree = ET.ElementTree(root)
+        tree.write(output_name)
+
+
 class WriterFactory():
     def __init__(self):
         self.types_dict = {
             "JSON": JsonWriter,
-            "XML": XmlWriter
+            "XML": XmlFromDbWriter,
         }
 
     def create_writer(self, output_type) -> Writer:
@@ -57,3 +71,12 @@ class DataDumper():
             self.output_name = "output"
         writer = self.writer_factory.create_writer(output_type)
         writer.write(self.output_name, data)
+
+
+if __name__ == "__main__":
+    list_of_dicts = []
+    for i in range(5):
+        list_of_dicts.append({i: f"num{i}", 10 + i: f"bum{i+2}"})
+    print(list_of_dicts)
+    xml_writer = XmlFromDbWriter()
+    xml_writer.write("test", list_of_dicts)
